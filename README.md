@@ -1,9 +1,36 @@
 # xilinx-opsmx
+
+this repo: https://github.com/robinhood-me/xilinx-opsmx
+
 Demo app for Xilinx
 
-Prerequisites: Spinnaker 1.2x.y deployed on Kubernetes 1.16x, access to spinnaker ui.
-Access to kubectl command line. Elasticsearch,prometheus and kibana are also available.
+Description. Deploy an application that generates issues for testing purposes.
 
+Prerequisites: Spinnaker 1.2x.y deployed on Kubernetes 1.16x, access to spinnaker ui.
+Access to kubectl command line. In a local Kubernetes cluster this might be on your kubernetes master node. In GCP this is through the gcloud SDK installed locally or via the GCP console in the terminal window. Elasticsearch,prometheus and kibana are also available.
+
+Table of Contents
+Stages:
+stage 0: Configuration
+stage 1: build
+stage 2: dockerstage
+stage 3: Deploy
+stage 4: load
+stage 5: check the Issue Generator application via external IP.
+
+stage 0: Configuration
+
+Note: saves time to find the lastest github repo commit ID and enter it under parameters section. Otherwise each time you execute the pipeline you have to enter it manually.
+
+github repo with application: 
+
+Tool integrations and secrets needed:
+
+NOTE: There are places in the manifests that need to have values changed
+- the environment name that you have Spinnaker deployed to, Kubernetes defaults to `default` but you might have specified an environment when you deployed spinnaker.
+- 
+
+JENKINS
 Jenkins to apply load. \
 Have jenkins configured
 Configure Jenkins for load: https://spinnaker.io/setup/ci/jenkins/
@@ -13,6 +40,8 @@ Service - template we create that references it. So autopilot can do verificatio
 Datasource, prometheus`
 Configure configmaps
 
+KANIKO SECRET
+
 
 
 
@@ -20,9 +49,6 @@ Configure configmaps
 Name of the persistent volume claim created in the cluster needs to match that in the configure stage manifest. ??
 
 Spinnaker configuration: via halyard
-
-Configure orca-local for docker stage.
-
  kubectl -n spin get pods | grep halyard-0
 
  kubectl -n spin cp orca-local.yml <halyard pod name>:/home/spinnaker/default/profiles
@@ -31,6 +57,9 @@ Copy orca-local.yml to the /home/spinnaker/default/profiles directory in halyard
 
  kubectl exec -it <halyard pod name> bash
   hal deploy apply
+
+Configure orca-local for docker stage.
+
  kubectl get pods -w
 Run hal deploy apply inside halyard pod. Wait for the pod to restart.
 
