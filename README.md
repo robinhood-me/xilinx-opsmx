@@ -3,7 +3,7 @@
 this repo: https://github.com/robinhood-me/xilinx-opsmx
 application we deploy in this pipeline repo: https://github.com/OpsMx/issue-generator
 
-Image link to show application landing page here.
+![Alt text](/IssueGeneratorApp.png?raw=true "this is what you're looking for to get a successful pipeline")
 
 Demo app for Xilinx
 
