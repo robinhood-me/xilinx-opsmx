@@ -1,7 +1,10 @@
 # xilinx-opsmx
 
-this repo: https://github.com/robinhood-me/xilinx-opsmx
-application we deploy in this pipeline repo: https://github.com/OpsMx/issue-generator
+this repo: https://github.com/robinhood-me/xilinx-opsmx 
+
+app to deploy repo: https://github.com/OpsMx/issue-generator
+
+Here's what the application we deploy in this pipeline looks like when you're pipeline works: 
 
 ![Alt text](/IssueGeneratorApp.png?raw=true "this is what you're looking for to get a successful pipeline")
 
