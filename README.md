@@ -4,18 +4,30 @@ this repo: https://github.com/robinhood-me/xilinx-opsmx
 
 app to deploy repo: https://github.com/OpsMx/issue-generator
 
+DockerHub repo: 
+
 Here's what the application we deploy in this pipeline looks like when you're pipeline works: 
 
 ![Alt text](/IssueGeneratorApp.png?raw=true "this is what you're looking for to get a successful pipeline")
 
-Demo app for Xilinx
+The landing page for the Issue Generator Demo app for Xilinx
 
-Description. Deploy an application that generates issues for testing purposes.
 
-Prerequisites: Spinnaker 1.2x.y deployed on Kubernetes 1.16x, access to spinnaker ui.
-Access to kubectl command line. In a local Kubernetes cluster this might be on your kubernetes master node. In GCP this is through the gcloud SDK installed locally or via the GCP console in the terminal window. Elasticsearch,prometheus and kibana are also available.
+STEPS TO CREATE PIPELINE
+
+Description. Deploy an Issue Generator application using any trigger type or starts by clicking on manual execution, builds a image using gradle, creates a DockerFile in DockerHub, deploys that Docker image onto Kubernetes cluster, and generates a Load Balancer that exposes the application so a browser can open it. 
+
+Prerequisites: 
+1. Spinnaker 1.2x.y deployed on Kubernetes 1.16x, access to spinnaker ui. 
+2. Access to kubectl command line. In a local Kubernetes cluster this might be on your kubernetes master node. In GCP this is through the gcloud SDK installed locally or via the GCP console in the terminal window. 
+3. If triggering with Github, a github webhook, a github developer token and a Halyard (hal) configuration of this relationship has to be created.
+4. A git secret which also gets configured in hal
+5. A Kaniko secret needs to be created if using Kaniko to do the Dockerfile image build.
+6. jenkins instance and jenkins credentials added to hal configuration
+7. Elasticsearch,prometheus and kibana are also available.
 
 Table of Contents
+Prerequisites
 Stages:
 stage 0: Configuration
 stage 1: build
@@ -23,6 +35,16 @@ stage 2: dockerstage
 stage 3: Deploy
 stage 4: load
 stage 5: check the Issue Generator application via external IP.
+
+PREREQUISITE INSTRUCTIONS:
+how to change the Halyard configuration
+
+1. exec into the halyard pod
+- Note: hal files are stored in a couple of places under /home/spinnaker/.hal, for instance the github token file can just go in the .hal directory just mentioned, and the orca-local.yml file goes in /home/spinnaker/.hal/default/profiles directory.
+
+2. command to get into halyard pod: kubectl -n robin exec -it oes32-spinnaker-halyard-0 -- /bin/bash
+
+
 
 stage 0: Configuration
 
@@ -137,7 +159,7 @@ Add log template: https://docs.opsmx.com/autopilot/analysis-setup/templates/log-
 MISC
 My Notes
 
-Personal Github access token for Spinnaker trigger artifact constraints field
+Personal Github access token for Spinnaker artifact constraints field
 ef3768104031e102bb0a997adb8a7d93d54189db
 kubectl -n robin exec -it oes32-spinnaker-halyard-0 -- /bin/bash
 /home/spinnaker/.hal/token
