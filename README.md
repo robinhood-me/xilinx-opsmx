@@ -21,7 +21,7 @@ Stages: <br />
 stage 0: Configuration <br />
 stage 1: build #aka gradle build stage <br />
 stage 2: dockerstage <br />
-stage 3: Deploy <br />
+stage 3: Deploy [ sic ]<br />
 stage 4: load <br />
 stage 5: check the Issue Generator application via external IP.
 
