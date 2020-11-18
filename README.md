@@ -31,7 +31,9 @@ Some prerequisites may be optional depending on the tooling you use:
 
 1. Spinnaker 1.2x.y deployed on Kubernetes 1.16x, access to spinnaker ui. 
 
-2. Access to kubectl command line. In a local Kubernetes cluster this might be on your kubernetes master node. In GCP this is through the gcloud SDK installed locally so you can access via a local terminal or via the GCP console in the split pane terminal window. 
+2. Access to kubectl command line. In a local Kubernetes cluster this might be on your kubernetes master node. In GCP this is through the gcloud SDK installed locally so you can access via a local terminal or via the GCP console in the split pane terminal window. <br />
+
+Secrets, tokens and Tool integrations, oh my!
 
 3. If using and triggering from Github, a github secret, a github webhook, a github developer token and a Halyard (hal) configuration of this relationship between Github and Spinnaker has to be created inside the Spinnaker halyard pod. <br />
 https://spinnaker.io/setup/artifacts/github/
@@ -71,11 +73,8 @@ stage 0: Configuration
 
 Note: saves time to find the lastest commit ID in the Github repo https://github.com/OpsMx/issue-generator and enter it under parameters section. Otherwise each time you execute the pipeline you have to enter it manually.
 
-github repo with application: 
-
-Tool integrations and secrets needed:
-
-NOTE: There are places in the manifests that need to have values changed
+NOTE: There are places in the manifests that need to have values changed <br />
+For Instance:
 - the environment name that you have Spinnaker deployed to, Kubernetes defaults to `default` but you might have specified an environment when you deployed spinnaker.
 - the selector app: value declaration in the yaml files. for instance the replicaset manifest and the associated service manifest need to have matching selector key: values. example: selector: app: kubecanary
 
