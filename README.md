@@ -14,6 +14,8 @@ Here's what the application we deploy in this pipeline looks like when you're pi
 
 The landing page for the Issue Generator Demo app for Xilinx
 
+Link to my instance of Spinnaker pipeline: http://35.247.49.113:9000
+
 TABLE OF CONTENTS <br />
 PREREQUISITES <br />
 STEPS TO CREATE PIPELINE <br />
@@ -397,7 +399,21 @@ Template
 - log template
 - Also available is Elasticsearch and kibana
 
-MANIFESTS WE PROVIDE:
+MANIFESTS WE PROVIDE: 
 
-Orca yaml
+We are working on creating a setup pipeline, but we also provided these yamls in this repo.
 
+SETUP LIST
+gradle pvc yaml
+gradle configmap with init script
+gitsecret.yml
+kaniko pvc yml
+kaniko secret
+baseline.yml  #Deploy stage manifest
+baseline service
+canary service
+
+HALYARD LIST
+orca-local.yml
+jenkins setup
+github setup
