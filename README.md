@@ -77,7 +77,7 @@ Tool integrations and secrets needed:
 
 NOTE: There are places in the manifests that need to have values changed
 - the environment name that you have Spinnaker deployed to, Kubernetes defaults to `default` but you might have specified an environment when you deployed spinnaker.
-- 
+- the selector app: value declaration in the yaml files. for instance the replicaset manifest and the associated service manifest need to have matching selector key: values. example: selector: app: kubecanary
 
 JENKINS
 Jenkins to apply load. \
@@ -90,9 +90,6 @@ Datasource, prometheus`
 Configure configmaps
 
 KANIKO SECRET
-
-
-
 
 
 Name of the persistent volume claim created in the cluster needs to match that in the configure stage manifest. ??
