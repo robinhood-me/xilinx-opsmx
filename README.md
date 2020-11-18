@@ -27,7 +27,9 @@ stage 5: check the Issue Generator application via external IP.
 
 PREREQUISITES
 
-Some prerequisites may be optional depending on the tooling you use:
+Note: Some prerequisites may be optional depending on the tooling you use.
+
+Versions and administration
 
 1. Spinnaker 1.2x.y deployed on Kubernetes 1.16x, access to spinnaker ui. 
 
@@ -52,7 +54,7 @@ https://spinnaker.io/setup/ci/jenkins/
 6. If a stage in your pipeline gets triggered by Artifactory, another hal configuration needs to be done. <br />
 https://spinnaker.io/guides/user/pipeline/triggers-with-artifactsrewrite/artifactory/ <br />
 
-STORAGE NEEDS
+Storage Needs
 
 7.  A persistent volume claim in this pipeline. Two possibilities, One if that can be provisioned by manifest to dynamically be used by Docker volume mounts in the dockerstage--stage 2 (mode can be ReadWriteOnly), or one for providing an NFS share that can be used by multiple pods (mode has to be ReadWriteMany). In either case we use Kubernetes StorageClass to avoid having to manually create the underlying Persistant Volume in the cluster.  
 
