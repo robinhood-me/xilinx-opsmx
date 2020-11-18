@@ -24,6 +24,7 @@ stage 2: dockerstage <br />
 stage 3: Deploy [ sic ]<br />
 stage 4: load <br />
 stage 5: check the Issue Generator application via external IP.
+MANIFESTS WE PROVIDE
 
 PREREQUISITES
 
@@ -60,7 +61,7 @@ Storage Needs
 
 8. Elasticsearch,prometheus and kibana are also available.
 
-
+Manifests are at the end of this README.
 
 PREREQUISITE INSTRUCTIONS:
 how to change the Halyard configuration
@@ -395,4 +396,8 @@ Template
 - datasource
 - log template
 - Also available is Elasticsearch and kibana
+
+MANIFESTS WE PROVIDE:
+
+Orca yaml
 
