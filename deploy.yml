@@ -1,0 +1,185 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: dockerjob-claim
+  namespace: robin
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 3Gi
+  storageClassName: standard
+  volumeMode: Filesystem
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: newgitrepo-claim
+  namespace: robin
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 3Gi
+  storageClassName: standard
+  volumeMode: Filesystem
+---
+apiVersion: v1
+data:
+  gitpassword: cjAwNzAwN1Ik
+  gitusername: cm9iaW5ob29kLW1l
+kind: Secret
+metadata:
+  name: gitsecret
+  namespace: robin
+type: Opaque
+---
+apiVersion: v1
+data:
+  config.json: ewogICAgICAgICJhdXRocyI6IHsKICAgICAgICAgICAgICAgICJodHRwczovL2luZGV4LmRvY2tlci5pby92MS8iOiB7CiAgICAgICAgICAgICAgICAgICAgICAgICJhdXRoIjogImNtOWlhVzVvYjI5a2FHOXZaRHB5TURBM01EQTNVZz09IgogICAgICAgICAgICAgICAgfQoJfQp9Cg==
+kind: Secret
+metadata:
+  name: kaniko
+  namespace: robin
+type: Opaque
+---
+apiVersion: v1
+data:
+  run.sh: |
+    #!/bin/bash
+    cd /usr/src
+    git --version
+    basedir=$(echo $gitrepo | sed 's/\// /g' | awk '{ print $NF}' | sed 's/.git//')
+    ####################
+    #echo checking if workspace needs to be removed
+    if [ "$cleanworkspace" = true ] ; then
+    #echo "deleting workspace $basedir"
+    rm -rf $basedir
+    fi
+    ####################
+    echo checking if $basedir exists
+    if [ -d "$basedir" ]; then
+    echo updating "$basedir"
+    cd $basedir
+    else
+    echo cloning "$basedir"
+    git clone  -b "$gitbranch" "https://"$gitusername":"$gitpassword"@"$gitrepo""
+
+    cd $basedir
+    fi
+    #########################
+    git status
+    echo
+    echo current revision of workspace is
+    git rev-parse HEAD
+    revision=$(git rev-parse HEAD)
+    echo
+    echo Outputs:
+    echo
+    echo SPINNAKER_PROPERTY_COMMITID="$revision"
+    echo
+    echo running maven
+    cd /usr/src/"$pomxmlpath"
+    ./gradlew clean build
+kind: ConfigMap
+metadata:
+  name: issugen-gradle-script
+  namespace: robin
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: issuegen-baseline
+  namespace: robin
+spec:
+  clusterIP: 10.4.4.160
+  externalTrafficPolicy: Cluster
+  ports:
+  - name: baseline
+    nodePort: 30268
+    port: 8088
+    protocol: TCP
+    targetPort: 8088
+  selector:
+    app: kubebaseline
+  sessionAffinity: None
+  type: LoadBalancer
+status:
+  loadBalancer:
+    ingress:
+    - ip: 35.233.137.175
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/managed-by: spinnaker
+    app.kubernetes.io/name: xilinx
+  name: issuegen-canary
+  namespace: robin
+spec:
+  clusterIP: 10.4.4.103
+  externalTrafficPolicy: Cluster
+  ports:
+  - name: canary
+    nodePort: 31211
+    port: 8088
+    protocol: TCP
+    targetPort: 8088
+  selector:
+    app: kubecanary
+  sessionAffinity: None
+  type: LoadBalancer
+status:
+  loadBalancer:
+    ingress:
+    - ip: 34.82.76.1
+---
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  labels:
+    issugen: issugen-canary
+  name: issuegenv2
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kubecanary
+  template:
+    metadata:
+      labels:
+        app: kubecanary
+    spec:
+      containers:
+        - env:
+            - name: DD_AGENT_HOST
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.hostIP
+            - name: SERVICE_NAME
+              value: issuegen_v2
+          image: >-
+            docker.io/robinhoodhood/issuegen:gradle-issugen-${parameters.commitid}
+          imagePullPolicy: Always
+          name: canaryapp-rest-1
+          ports:
+            - containerPort: 8088
+              name: http
+              protocol: TCP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: issuegen-canary
+spec:
+  ports:
+    - name: canary
+      port: 8088
+      protocol: TCP
+      targetPort: 8088
+  selector:
+    app: kubecanary
+  type: LoadBalancer

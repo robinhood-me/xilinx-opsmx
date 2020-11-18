@@ -1,0 +1,74 @@
+job:
+  preconfigured:
+    kubernetes:
+      - label: dockerStage
+        type: customJobdockerStage
+        description: Stage for doing a docker build and push
+        cloudProvider: kubernetes
+        account: target-aks-cluster
+        credentials: target-aks-cluster
+        waitForCompletion: true
+        application: gitdemo
+        parameters:
+          - label: dockerfileargument
+            name: pass dockerfilepath
+            description: pass dockerfilepath .
+            mapping: 'manifest.spec.template.spec.containers[0].args[0]'
+            defaultValue: --dockerfile=/workspace/restapp/Dockerfile
+          - label: dockercontextargument
+            name: pass dockercontextargument
+            description: pass dockerfilepath.
+            mapping: 'manifest.spec.template.spec.containers[0].args[1]'
+            defaultValue: --context=/workspace/restapp
+          - label: dockerimageargument
+            name: pass dockerimageargument
+            description: pass dockerimageargument.
+            mapping: 'manifest.spec.template.spec.containers[0].args[2]'
+            defaultValue: --destination=gopalvithaljayanthi/restapp:fromkaniko
+          - label: namespace
+            name: namespace
+            description: pass namespace in which you want to deploy k8s job.
+            mapping: manifest.metadata.namespace
+            defaultValue: robin
+        manifest:
+          apiVersion: batch/v1
+          kind: Job
+          metadata:
+            name: dockerjob
+            namespace: robin
+          spec:
+            backoffLimit: 0
+            template:
+              spec:
+                restartPolicy: Never
+                volumes:
+                  - name: gitrepo
+                    persistentVolumeClaim:
+                      claimName: newgitrepo-claim
+                  - name: kaniko-secret
+                    secret:
+                       secretName: kaniko
+                       items:
+                        - key: config.json
+                          path: config.json
+                  - name: kaniko-cache
+                    persistentVolumeClaim:
+                       claimName: dockerjob-claim
+                containers:
+                  - name: kaniko
+                    image: 'gcr.io/kaniko-project/executor:latest'
+                    imagePullPolicy: Always
+                    args:
+                       -
+                       -
+                       -
+                       - --cache=true
+                       - --cache-dir=/cache
+                       - --cache-repo=gopalvithaljayanthi/restapp-cache
+                    volumeMounts:
+                      - name: gitrepo
+                        mountPath: /workspace
+                      - name: kaniko-secret
+                        mountPath: /kaniko/.docker/
+                      - name: kaniko-cache
+                        mountPath: /cache

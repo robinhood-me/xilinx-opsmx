@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  labels:
+    issugen: issugen-canary
+  name: issuegenv2
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kubecanary
+  template:
+    metadata:
+      labels:
+        app: kubecanary
+    spec:
+      containers:
+        - env:
+            - name: DD_AGENT_HOST
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.hostIP
+            - name: SERVICE_NAME
+              value: issuegen_v2
+          image: >-
+            docker.io/robinhoodhood/issuegen:gradle-issugen-${parameters.commitid}
+          imagePullPolicy: Always
+          name: canaryapp-rest-1
+          ports:
+            - containerPort: 8088
+              name: http
+              protocol: TCP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: issuegen-canary
+spec:
+  ports:
+    - name: canary
+      port: 8080
+      protocol: TCP
+      targetPort: 8088
+  selector:
+    app: kubecanary
+  type: LoadBalancer

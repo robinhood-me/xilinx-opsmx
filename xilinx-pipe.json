@@ -1,0 +1,418 @@
+{
+  "appConfig": {},
+  "keepWaitingPipelines": false,
+  "lastModifiedBy": "admin",
+  "limitConcurrent": false,
+  "parameterConfig": [
+    {
+      "default": "",
+      "description": "9b8a044ff6afc853c889b435d97c48113055d391",
+      "hasOptions": false,
+      "label": "Commit Id",
+      "name": "commitid",
+      "options": [
+        {
+          "value": "multiclouddemo"
+        },
+        {
+          "value": ""
+        }
+      ],
+      "pinned": false,
+      "required": false
+    }
+  ],
+  "spelEvaluator": "v4",
+  "stages": [
+    {
+      "canceledStatuses": "",
+      "comments": "<a href =\"http://autopilot-demo.opsmx.com:8161/opsmx-analysis/public/canaryAnalysis.html#/analysis/${#stage(\"Autopilot Trigger\")[\"context\"][\"webhook\"][body].split(\":\")[1].split(\"}\")[0]}\" >Report URL</a>",
+      "method": "GET",
+      "name": "Autopilot Analysis",
+      "progressJsonPath": "",
+      "refId": "2",
+      "requisiteStageRefIds": [
+        "9"
+      ],
+      "retryStatusCodes": [
+        429
+      ],
+      "statusJsonPath": "$.status.status",
+      "statusUrlResolution": "getMethod",
+      "successStatuses": "COMPLETED",
+      "type": "webhook",
+      "url": "http://autopilot-demo.opsmx.com:8090/canaries/${#stage(\"Autopilot Trigger\")[\"context\"][\"webhook\"][body].split(\":\")[1].split(\"}\")[0]}",
+      "waitBeforeMonitor": "",
+      "waitForCompletion": true
+    },
+    {
+      "comments": "<a href =\"http://autopilot-demo.opsmx.com:8161/opsmx-analysis/public/canaryAnalysis.html#/analysis/${#stage(\"Autopilot Trigger\")[\"context\"][\"webhook\"][body].split(\":\")[1].split(\"}\")[0]}\" >Report URL</a>",
+      "completeOtherBranchesThenFail": false,
+      "continuePipeline": false,
+      "failPipeline": true,
+      "name": "Automated Judgment",
+      "preconditions": [
+        {
+          "context": {
+            "expression": "${#stage(\"Autopilot Analysis\")[\"context\"][\"webhook\"][monitor][body][canaryResult][overallScore]} >= ${#stage(\"Autopilot Analysis\")[\"context\"][\"webhook\"][monitor][body][canaryConfig][canarySuccessCriteria][canaryResultScore]}",
+            "failureMessage": "Score Not Reached the Upper Threshold Value.\nTo view Report:\n<a href =\"http://autopilot-demo.opsmx.com:8161/opsmx-analysis/public/canaryAnalysis.html#/analysis/${#stage(\"Autopilot Trigger\")[\"context\"][\"webhook\"][body].split(\":\")[1].split(\"}\")[0]}\" >Report URL</a>"
+          },
+          "failPipeline": true,
+          "type": "expression"
+        }
+      ],
+      "refId": "7",
+      "requisiteStageRefIds": [
+        "2",
+        "14"
+      ],
+      "type": "checkPreconditions"
+    },
+    {
+      "method": "POST",
+      "name": "Autopilot Trigger",
+      "payload": {
+        "application": "multiclouddemo",
+        "canaryConfig": {
+          "canaryAnalysisConfig": {
+            "beginCanaryAnalysisAfterMins": 0,
+            "canaryAnalysisIntervalMins": 6,
+            "name": "log-template:multicloud-secdrive-es-tmpl1",
+            "notificationHours": []
+          },
+          "canaryHealthCheckHandler": {
+            "minimumCanaryResultScore": 60
+          },
+          "canarySuccessCriteria": {
+            "canaryResultScore": 80
+          },
+          "combinedCanaryResultStrategy": "AGGREGATE",
+          "lifetimeHours": 0.1,
+          "name": "OpsMxUser"
+        },
+        "canaryDeployments": [
+          {
+            "baseline": {
+              "log": {
+                "secdrive-svc": {
+                  "kubernetes.container_name": "baseapp-rest-1"
+                }
+              }
+            },
+            "baselineStartTimeMs": "${new java.util.Date('October 19, 2020 06:30:00')}",
+            "canary": {
+              "log": {
+                "secdrive-svc": {
+                  "kubernetes.container_name": "${#stage(\"Deploy\")[\"context\"][\"manifests\"][0][\"spec\"][\"template\"][\"spec\"][\"containers\"][0][\"name\"]}"
+                }
+              }
+            },
+            "canaryStartTimeMs": "${new java.util.Date()}"
+          }
+        ],
+        "isJsonResponse": true
+      },
+      "refId": "9",
+      "requisiteStageRefIds": [
+        "18"
+      ],
+      "statusUrlResolution": "webhookResponse",
+      "type": "webhook",
+      "url": "http://autopilot-demo.opsmx.com:8090/registerCanary",
+      "waitForCompletion": false
+    },
+    {
+      "continuePipeline": false,
+      "failPipeline": true,
+      "job": "Spin-gradle-issuegen-load",
+      "master": "opsmx-jenkins-master",
+      "name": "Load",
+      "parameters": {
+        "loadtime": "420"
+      },
+      "refId": "14",
+      "requisiteStageRefIds": [
+        "9"
+      ],
+      "type": "jenkins"
+    },
+    {
+      "account": "default",
+      "alias": "runJob",
+      "application": "gitdemo",
+      "cloudProvider": "kubernetes",
+      "consumeArtifactSource": "propertyFile",
+      "credentials": "default",
+      "manifest": {
+        "apiVersion": "batch/v1",
+        "kind": "Job",
+        "metadata": {
+          "labels": {
+            "spinnakerlabel": "gradle-issugen"
+          },
+          "name": "gradle-issugen",
+          "namespace": "default"
+        },
+        "spec": {
+          "backoffLimit": 0,
+          "template": {
+            "spec": {
+              "containers": [
+                {
+                  "command": [
+                    "bash",
+                    "/tmp/initscript/run.sh"
+                  ],
+                  "env": [
+                    {
+                      "name": "gitrepo",
+                      "value": "github.com/OpsMx/issue-generator.git"
+                    },
+                    {
+                      "name": "gitbranch",
+                      "value": "gradle_issuegen"
+                    },
+                    {
+                      "name": "cleanworkspace",
+                      "value": "true"
+                    },
+                    {
+                      "name": "pomxmlpath",
+                      "value": "issue-generator"
+                    },
+                    {
+                      "name": "gitusername",
+                      "valueFrom": {
+                        "secretKeyRef": {
+                          "key": "gitusername",
+                          "name": "gitsecret"
+                        }
+                      }
+                    },
+                    {
+                      "name": "gitpassword",
+                      "valueFrom": {
+                        "secretKeyRef": {
+                          "key": "gitpassword",
+                          "name": "gitsecret"
+                        }
+                      }
+                    }
+                  ],
+                  "image": "gradle:6.2.2-jdk8",
+                  "name": "gitmavenstage",
+                  "volumeMounts": [
+                    {
+                      "mountPath": "/tmp/initscript/",
+                      "name": "initscript"
+                    },
+                    {
+                      "mountPath": "/usr/src",
+                      "name": "gitrepo"
+                    }
+                  ]
+                }
+              ],
+              "restartPolicy": "Never",
+              "volumes": [
+                {
+                  "name": "gitrepo",
+                  "persistentVolumeClaim": {
+                    "claimName": "newgitrepo-claim"
+                  }
+                },
+                {
+                  "configMap": {
+                    "defaultMode": 420,
+                    "name": "issugen-gradle-script"
+                  },
+                  "name": "initscript"
+                }
+              ]
+            }
+          }
+        }
+      },
+      "name": "build",
+      "propertyFile": "gitmavenstage",
+      "refId": "16",
+      "requisiteStageRefIds": [],
+      "source": "text",
+      "type": "runJobManifest"
+    },
+    {
+      "alias": "preconfiguredJob",
+      "name": "dockerstage",
+      "parameters": {
+        "namespace": "default",
+        "pass dockercontextargument": "--context=/workspace/issue-generator",
+        "pass dockerfilepath": "--dockerfile=/workspace/issue-generator/Dockerfile",
+        "pass dockerimageargument": "--destination=opsmxdev/issuegen:gradle-issugen-${parameters.commitid}"
+      },
+      "refId": "17",
+      "requisiteStageRefIds": [
+        "16"
+      ],
+      "type": "customJobdockerStage"
+    },
+    {
+      "account": "default",
+      "cloudProvider": "kubernetes",
+      "manifestArtifactAccount": "docker-registry",
+      "manifests": [
+        {
+          "apiVersion": "apps/v1",
+          "kind": "ReplicaSet",
+          "metadata": {
+            "labels": {
+              "issugen": "issugen-canary"
+            },
+            "name": "issuegenv2"
+          },
+          "spec": {
+            "replicas": 1,
+            "selector": {
+              "matchLabels": {
+                "app": "kubecanary"
+              }
+            },
+            "template": {
+              "metadata": {
+                "labels": {
+                  "app": "kubecanary"
+                }
+              },
+              "spec": {
+                "containers": [
+                  {
+                    "env": [
+                      {
+                        "name": "DD_AGENT_HOST",
+                        "valueFrom": {
+                          "fieldRef": {
+                            "fieldPath": "status.hostIP"
+                          }
+                        }
+                      },
+                      {
+                        "name": "SERVICE_NAME",
+                        "value": "issuegen_v2"
+                      }
+                    ],
+                    "image": "docker.io/opsmxdev/issuegen:gradle-issugen-${parameters.commitid}",
+                    "imagePullPolicy": "Always",
+                    "name": "canaryapp-rest-1",
+                    "ports": [
+                      {
+                        "containerPort": 8088,
+                        "name": "http",
+                        "protocol": "TCP"
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        },
+        {
+          "apiVersion": "v1",
+          "kind": "Service",
+          "metadata": {
+            "name": "issuegen-canary",
+            "namespace": "default"
+          },
+          "spec": {
+            "ports": [
+              {
+                "name": "canary",
+                "port": 8080,
+                "protocol": "TCP",
+                "targetPort": 8080
+              }
+            ],
+            "selector": {
+              "app": "restappcanary"
+            },
+            "type": "LoadBalancer"
+          }
+        }
+      ],
+      "moniker": {
+        "app": "multiclouddemo"
+      },
+      "name": "Deploy",
+      "namespaceOverride": "default",
+      "refId": "18",
+      "relationships": {
+        "loadBalancers": [],
+        "securityGroups": []
+      },
+      "requisiteStageRefIds": [
+        "17"
+      ],
+      "skipExpressionEvaluation": false,
+      "source": "text",
+      "trafficManagement": {
+        "enabled": false,
+        "options": {
+          "enableTraffic": false
+        }
+      },
+      "type": "deployManifest"
+    },
+    {
+      "name": "Success",
+      "refId": "20",
+      "requisiteStageRefIds": [
+        "7"
+      ],
+      "stageEnabled": {
+        "expression": "${#stage(\"Autopilot Analysis\")[\"context\"][\"webhook\"][monitor][body][canaryResult][overallScore]} >= ${#stage(\"Autopilot Analysis\")[\"context\"][\"webhook\"][monitor][body][canaryConfig][canarySuccessCriteria][canaryResultScore]}",
+        "type": "expression"
+      },
+      "type": "wait",
+      "waitTime": 5
+    },
+    {
+      "account": "default",
+      "app": "multiclouddemo",
+      "cloudProvider": "kubernetes",
+      "kinds": [
+        "replicaSet"
+      ],
+      "labelSelectors": {
+        "selectors": [
+          {
+            "key": "issugen",
+            "kind": "EQUALS",
+            "values": [
+              "issugen-canary"
+            ]
+          }
+        ]
+      },
+      "location": "default",
+      "mode": "label",
+      "name": "Delete",
+      "options": {
+        "cascading": true
+      },
+      "refId": "21",
+      "requisiteStageRefIds": [
+        "2"
+      ],
+      "type": "deleteManifest"
+    }
+  ],
+  "triggers": [
+    {
+      "cronExpression": "0 50 18 1/1 * ? *",
+      "enabled": false,
+      "id": "59d02b93-0265-40fa-bd6d-1a85167dcc73",
+      "runAsUser": "ae14c0e2-baf7-414f-97a8-037134598ae0@managed-service-account",
+      "type": "cron"
+    }
+  ],
+  "updateTs": "1603185013000"
+}
