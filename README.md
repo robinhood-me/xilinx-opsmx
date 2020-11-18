@@ -31,7 +31,7 @@ Prerequisites depending on what other tooling you use:
 
 2. Access to kubectl command line. In a local Kubernetes cluster this might be on your kubernetes master node. In GCP this is through the gcloud SDK installed locally or via the GCP console in the split pane terminal window. 
 
-3. If using and triggering from Github, a github secret, a github webhook, a github developer token and a Halyard (hal) configuration of this relationship between Github and Spinnaker has to be created inside the Spinnaker halyard pod.
+3. If using and triggering from Github, a github secret, a github webhook, a github developer token and a Halyard (hal) configuration of this relationship between Github and Spinnaker has to be created inside the Spinnaker halyard pod. <br />
 https://spinnaker.io/setup/artifacts/github/
 
 4. A Kaniko secret needs to be created if using Kaniko to do the Dockerfile image build. <br />
