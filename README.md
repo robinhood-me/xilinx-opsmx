@@ -2,7 +2,7 @@
 
 this repo: https://github.com/robinhood-me/xilinx-opsmx 
 
-Description. Deploy an Issue Generator application using any trigger type or starts by clicking on manual execution, builds a image using gradle, creates a DockerFile in DockerHub, deploys that Docker image onto Kubernetes cluster, and generates a Load Balancer that exposes the application so a browser can open it. 
+Description. Deploy an Issue Generator application using any trigger type or start by clicking on manual execution, builds a image using gradle, creates a DockerFile in DockerHub, deploys that Docker image onto Kubernetes cluster, and generates a Load Balancer that exposes the application so a browser can open it. 
 
 repo for the application being deployed: https://github.com/OpsMx/issue-generator
 
