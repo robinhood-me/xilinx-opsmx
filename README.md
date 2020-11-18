@@ -19,11 +19,21 @@ Description. Deploy an Issue Generator application using any trigger type or sta
 
 Prerequisites: 
 1. Spinnaker 1.2x.y deployed on Kubernetes 1.16x, access to spinnaker ui. 
-2. Access to kubectl command line. In a local Kubernetes cluster this might be on your kubernetes master node. In GCP this is through the gcloud SDK installed locally or via the GCP console in the terminal window. 
-3. If triggering with Github, a github webhook, a github developer token and a Halyard (hal) configuration of this relationship has to be created.
-4. A git secret which also gets configured in hal
-5. A Kaniko secret needs to be created if using Kaniko to do the Dockerfile image build.
-6. jenkins instance and jenkins credentials added to hal configuration
+
+2. Access to kubectl command line. In a local Kubernetes cluster this might be on your kubernetes master node. In GCP this is through the gcloud SDK installed locally or via the GCP console in the split pane terminal window. 
+
+3. If using and triggering from Github, a github secret, a github webhook, a github developer token and a Halyard (hal) configuration of this relationship between Github and Spinnaker has to be created inside the Spinnaker halyard pod.
+https://spinnaker.io/setup/artifacts/github/
+
+4. A Kaniko secret needs to be created if using Kaniko to do the Dockerfile image build. 
+https://github.com/GoogleContainerTools/kaniko/blob/master/README.md
+
+5. Jenkins instance and jenkins credentials added to Spinnaker configuration using hal again in the halyard pod. 
+https://spinnaker.io/setup/ci/jenkins/
+
+6. If a stage in your pipeline gets triggered by Artifactory, another hal configuration needs to be done. 
+https://spinnaker.io/guides/user/pipeline/triggers-with-artifactsrewrite/artifactory/
+
 7. Elasticsearch,prometheus and kibana are also available.
 
 Table of Contents
@@ -42,7 +52,8 @@ how to change the Halyard configuration
 1. exec into the halyard pod
 - Note: hal files are stored in a couple of places under /home/spinnaker/.hal, for instance the github token file can just go in the .hal directory just mentioned, and the orca-local.yml file goes in /home/spinnaker/.hal/default/profiles directory.
 
-2. command to get into halyard pod: kubectl -n robin exec -it oes32-spinnaker-halyard-0 -- /bin/bash
+2. command to get into halyard pod: kubectl -n <yourSpinnakerEnvironment> exec -it <nameOfTheHalyardPod> -- /bin/bash
+Example: kubectl -n robin exec -it oes32-spinnaker-halyard-0 -- /bin/bash
 
 
 
