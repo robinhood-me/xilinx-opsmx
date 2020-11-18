@@ -62,7 +62,7 @@ how to change the Halyard configuration
 1. exec into the halyard pod
 - Note: hal files are stored in a couple of places under /home/spinnaker/.hal, for instance the github token file can just go in the .hal directory just mentioned, and the orca-local.yml file goes in /home/spinnaker/.hal/default/profiles directory.
 
-2. command to get into halyard pod: kubectl -n <yourSpinnakerEnvironment> exec -it <nameOfTheHalyardPod> -- /bin/bash <br />
+2. command to get into halyard pod: kubectl -n <yourSpinnakerEnvironment> exec -it \<nameOfTheHalyardPod\> -- /bin/bash <br />
 Example: kubectl -n robin exec -it oes32-spinnaker-halyard-0 -- /bin/bash
 
 
