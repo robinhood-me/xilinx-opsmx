@@ -6,7 +6,7 @@ Description. Deploy an Issue Generator application using any trigger type or sta
 
 repo for the application being deployed: https://github.com/OpsMx/issue-generator
 
-DockerHub repo: 
+DockerHub repo: https://hub.docker.com/u/opsmxdev or your own container repo
 
 Here's what the application we deploy in this pipeline looks like when you're pipeline works: 
 
