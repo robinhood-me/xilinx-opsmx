@@ -19,7 +19,7 @@ PREREQUISITES <br />
 STEPS TO CREATE PIPELINE <br />
 Stages: <br />
 stage 0: Configuration <br />
-stage 1: build <br />
+stage 1: build #aka gradle build stage <br />
 stage 2: dockerstage <br />
 stage 3: Deploy <br />
 stage 4: load <br />
