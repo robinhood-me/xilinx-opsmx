@@ -69,7 +69,7 @@ Example: kubectl -n robin exec -it oes32-spinnaker-halyard-0 -- /bin/bash
 
 stage 0: Configuration
 
-Note: saves time to find the lastest github repo commit ID and enter it under parameters section. Otherwise each time you execute the pipeline you have to enter it manually.
+Note: saves time to find the lastest commit ID in the Github repo https://github.com/OpsMx/issue-generator and enter it under parameters section. Otherwise each time you execute the pipeline you have to enter it manually.
 
 github repo with application: 
 
