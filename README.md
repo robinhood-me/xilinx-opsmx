@@ -2,7 +2,9 @@
 
 this repo: https://github.com/robinhood-me/xilinx-opsmx 
 
-app to deploy repo: https://github.com/OpsMx/issue-generator
+Description. Deploy an Issue Generator application using any trigger type or starts by clicking on manual execution, builds a image using gradle, creates a DockerFile in DockerHub, deploys that Docker image onto Kubernetes cluster, and generates a Load Balancer that exposes the application so a browser can open it. 
+
+repo for the application being deployed: https://github.com/OpsMx/issue-generator
 
 DockerHub repo: 
 
@@ -12,12 +14,19 @@ Here's what the application we deploy in this pipeline looks like when you're pi
 
 The landing page for the Issue Generator Demo app for Xilinx
 
+TABLE OF CONTENTS
+Prerequisites
+Stages:
+stage 0: Configuration
+stage 1: build
+stage 2: dockerstage
+stage 3: Deploy
+stage 4: load
+stage 5: check the Issue Generator application via external IP.
 
 STEPS TO CREATE PIPELINE
 
-Description. Deploy an Issue Generator application using any trigger type or starts by clicking on manual execution, builds a image using gradle, creates a DockerFile in DockerHub, deploys that Docker image onto Kubernetes cluster, and generates a Load Balancer that exposes the application so a browser can open it. 
-
-Prerequisites: 
+Prerequisites depending on what other tooling you use: 
 1. Spinnaker 1.2x.y deployed on Kubernetes 1.16x, access to spinnaker ui. 
 
 2. Access to kubectl command line. In a local Kubernetes cluster this might be on your kubernetes master node. In GCP this is through the gcloud SDK installed locally or via the GCP console in the split pane terminal window. 
@@ -28,23 +37,21 @@ https://spinnaker.io/setup/artifacts/github/
 4. A Kaniko secret needs to be created if using Kaniko to do the Dockerfile image build. 
 https://github.com/GoogleContainerTools/kaniko/blob/master/README.md
 
+OR
+
+4. DockerHub public repo or your own Enterprise Docker registry/repository or a cloud container hub service.
+
 5. Jenkins instance and jenkins credentials added to Spinnaker configuration using hal again in the halyard pod. 
 https://spinnaker.io/setup/ci/jenkins/
 
 6. If a stage in your pipeline gets triggered by Artifactory, another hal configuration needs to be done. 
 https://spinnaker.io/guides/user/pipeline/triggers-with-artifactsrewrite/artifactory/
 
-7. Elasticsearch,prometheus and kibana are also available.
+7.  A persistent volume claim in this pipeline. Two possibilities, One if that can be provisioned by manifest to dynamically be used by Docker volume mounts in the dockerstage--stage 2 (mode can be ReadWriteOnly), or one for providing an NFS share that can be used by multiple pods (mode has to be ReadWriteMany). In either case we use Kubernetes StorageClass to avoid having to manually create the underlying Persistant Volume in the cluster.  
 
-Table of Contents
-Prerequisites
-Stages:
-stage 0: Configuration
-stage 1: build
-stage 2: dockerstage
-stage 3: Deploy
-stage 4: load
-stage 5: check the Issue Generator application via external IP.
+8. Elasticsearch,prometheus and kibana are also available.
+
+
 
 PREREQUISITE INSTRUCTIONS:
 how to change the Halyard configuration
@@ -260,8 +267,8 @@ correct storageClassName attribute. For example:
 
 ARTIFACTORY
 https://opsmx1.jfrog.io/
-username=robin
-Goyanks#2416
+username=redacted
+password=redacted
 
 
 changing namespace to your cluster namespace (e.g. from robin to your Spinnaker namespace)
