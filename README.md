@@ -31,7 +31,7 @@ Some prerequisites may be optional depending on the tooling you use:
 
 1. Spinnaker 1.2x.y deployed on Kubernetes 1.16x, access to spinnaker ui. 
 
-2. Access to kubectl command line. In a local Kubernetes cluster this might be on your kubernetes master node. In GCP this is through the gcloud SDK installed locally or via the GCP console in the split pane terminal window. 
+2. Access to kubectl command line. In a local Kubernetes cluster this might be on your kubernetes master node. In GCP this is through the gcloud SDK installed locally so you can access via a local terminal or via the GCP console in the split pane terminal window. 
 
 3. If using and triggering from Github, a github secret, a github webhook, a github developer token and a Halyard (hal) configuration of this relationship between Github and Spinnaker has to be created inside the Spinnaker halyard pod. <br />
 https://spinnaker.io/setup/artifacts/github/
@@ -62,7 +62,7 @@ how to change the Halyard configuration
 1. exec into the halyard pod
 - Note: hal files are stored in a couple of places under /home/spinnaker/.hal, for instance the github token file can just go in the .hal directory just mentioned, and the orca-local.yml file goes in /home/spinnaker/.hal/default/profiles directory.
 
-2. command to get into halyard pod: kubectl -n <yourSpinnakerEnvironment> exec -it <nameOfTheHalyardPod> -- /bin/bash
+2. command to get into halyard pod: kubectl -n <yourSpinnakerEnvironment> exec -it <nameOfTheHalyardPod> -- /bin/bash <br />
 Example: kubectl -n robin exec -it oes32-spinnaker-halyard-0 -- /bin/bash
 
 
