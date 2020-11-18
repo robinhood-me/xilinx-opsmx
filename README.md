@@ -14,19 +14,21 @@ Here's what the application we deploy in this pipeline looks like when you're pi
 
 The landing page for the Issue Generator Demo app for Xilinx
 
-TABLE OF CONTENTS
-Prerequisites
-Stages:
-stage 0: Configuration
-stage 1: build
-stage 2: dockerstage
-stage 3: Deploy
-stage 4: load
+TABLE OF CONTENTS <br />
+PREREQUISITES <br />
+STEPS TO CREATE PIPELINE <br />
+Stages: <br />
+stage 0: Configuration <br />
+stage 1: build <br />
+stage 2: dockerstage <br />
+stage 3: Deploy <br />
+stage 4: load <br />
 stage 5: check the Issue Generator application via external IP.
 
-STEPS TO CREATE PIPELINE
+PREREQUISITES
 
-Prerequisites depending on what other tooling you use: 
+Some prerequisites may be optional depending on the tooling you use:
+
 1. Spinnaker 1.2x.y deployed on Kubernetes 1.16x, access to spinnaker ui. 
 
 2. Access to kubectl command line. In a local Kubernetes cluster this might be on your kubernetes master node. In GCP this is through the gcloud SDK installed locally or via the GCP console in the split pane terminal window. 
