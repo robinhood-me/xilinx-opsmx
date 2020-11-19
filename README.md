@@ -24,7 +24,7 @@ stage 0: Configuration <br />
 stage 1: build #aka gradle build stage <br />
 stage 2: dockerstage <br />
 stage 3: Deploy [ sic ]<br />
-stage 4: load <br />
+stage 4: load #run a baseline load and a canary load against the application <br />
 stage 5: check the Issue Generator application via external IP.
 MANIFESTS WE PROVIDE
 
@@ -52,7 +52,8 @@ OR
 https://spinnaker.io/setup/install/providers/docker-registry/
 
 5. Jenkins instance and jenkins credentials added to Spinnaker configuration using hal again in the halyard pod. <br />
-https://spinnaker.io/setup/ci/jenkins/
+https://spinnaker.io/setup/ci/jenkins/ <br />
+NOTE: hal config ci jenkins master edit my-jenkins-master --csrf true #fixed the 403 permission error in load stage.
 
 6. If a stage in your pipeline gets triggered by Artifactory, another hal configuration needs to be done. <br />
 https://spinnaker.io/guides/user/pipeline/triggers-with-artifactsrewrite/artifactory/ <br />
@@ -74,9 +75,9 @@ how to change the Halyard configuration
 2. command to get into halyard pod: kubectl -n <yourSpinnakerEnvironment> exec -it \<nameOfTheHalyardPod\> -- /bin/bash <br />
 Example: kubectl -n robin exec -it oes32-spinnaker-halyard-0 -- /bin/bash
 
+CONFIGURE THE STAGES
 
-
-stage 0: Configuration
+STAGE 0: Configuration
 
 Note: saves time to find the lastest commit ID in the Github repo https://github.com/OpsMx/issue-generator and enter it under parameters section. Otherwise each time you execute the pipeline you have to enter it manually.
 
@@ -85,15 +86,34 @@ For Instance:
 - the environment name that you have Spinnaker deployed to, Kubernetes defaults to `default` but you might have specified an environment when you deployed spinnaker.
 - the selector app: value declaration in the yaml files. for instance the replicaset manifest and the associated service manifest need to have matching selector key: values. example: selector: app: kubecanary
 
+
+STAGE 1: build #aka gradle build stage <br />
+
+
+STAGE 2: dockerstage <br />
+
+
+STAGE 3: Deploy [ sic ]<br />
+
+
+STAGE: 4 load
 JENKINS
-Jenkins to apply load. \
-Have jenkins configured
-Configure Jenkins for load: https://spinnaker.io/setup/ci/jenkins/
+Configure Jenkins for the load stage: https://spinnaker.io/setup/ci/jenkins/ <br />
+Note: I added this to the halyard jenkins configuration: <br />
+hal config ci jenkins master edit my-jenkins-master --csrf true <br />
+This fixed the 403 error in the LOAD stage.
+
+
+STAGE 5: check the Issue Generator application via external IP.
+
+
+
 Configure Autopilot
 App - HelloWorld, create app diff from Spinnaker
 Service - template we create that references it. So autopilot can do verification, it’s a monitor. 
 Datasource, prometheus`
 Configure configmaps
+
 
 KANIKO SECRET
 
