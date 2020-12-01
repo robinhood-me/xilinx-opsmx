@@ -1,0 +1,12 @@
+<distributionManagement>
+    <repository>
+        <id>central</id>
+        <name>test-releases</name>
+        <url>https://opsmx1.jfrog.io/artifactory/xilinx-spinnaker-art</url>
+    </repository>
+    <snapshotRepository>
+        <id>snapshots</id>
+        <name>test-snapshots</name>
+        <url>https://opsmx1.jfrog.io/artifactory/xilinx-spinnaker-art</url>
+    </snapshotRepository>
+</distributionManagement>

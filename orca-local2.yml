@@ -1,0 +1,220 @@
+job:
+  preconfigured:
+    kubernetes: 
+      - label: TSPlanJob
+        cloudProvider: kubernetes
+        credentials: default
+        application: opsmx
+        description: Stage for terraspin plan operation
+        account: default
+        type: customTSPlanJobStage
+        waitForCompletion: true
+        parameters:
+          - defaultValue: "" 
+            description: Please enter the artifact account name from artifactsaccounts.json.
+            label: Artifact account
+            mapping: 'manifest.spec.template.spec.containers[0].env[0].value'
+            name: Artifact account
+          - defaultValue: "" 
+            description: Please enter terraform module repo where the code is present.
+            label: Terraform plan
+            mapping: 'manifest.spec.template.spec.containers[0].env[1].value'
+            name: Terraform plan
+          - defaultValue: "" 
+            description: Please enter overrideVariableFile path if you want to override variables.
+            label: Override file
+            mapping: 'manifest.spec.template.spec.containers[0].env[2].value'
+            name: Override file
+          - defaultValue: "" 
+            description: Please enter the repo name where you want to save terraform intermediate state.
+            label: State repo
+            mapping: 'manifest.spec.template.spec.containers[0].env[3].value'
+            name: State repo
+          - defaultValue: "" 
+            description: Please enter a unique id to identify the terraform state.
+            label: UUId
+            mapping: 'manifest.spec.template.spec.containers[0].env[4].value'
+            name: UUId
+          - defaultValue: "" 
+            description: Please enter AWS IAM role name.
+            label: "iam.amazonaws.com/role"
+            mapping: "manifest.spec.template.metadata.annotations.'iam.amazonaws.com/role'"
+            name: "k8annotation"
+        manifest:
+          apiVersion: batch/v1
+          kind: Job
+          metadata:
+            name: terraspinplanjob
+            namespace: robin
+          spec:
+            backoffLimit: 0
+            template:
+              metadata:
+                annotations:
+                  "[iam.amazonaws.com/role]":
+              spec:
+                containers:
+                  - command:
+                      - PlanRun.sh
+                    env:
+                      - name: artifactAccount
+                        value: 
+                      - name: plan
+                        value: 
+                      - name: variableOverrideFileRepo
+                        value: 
+                      - name: stateRepo
+                        value: 
+                      - name: uuId
+                        value: 
+                      - name: component
+                        value: plan
+                    image: 'docker.io/opsmx11/terraspinjob:4.0'
+                    imagePullPolicy: Always
+                    name: terraspinplan
+                    volumeMounts:
+                      - mountPath: /home/terraspin/opsmx/app/config/
+                        name: opsmx-terraspin-backend-config
+                restartPolicy: Never
+                volumes:
+                  - configMap:
+                      name: terraspinbackendconfig
+                    name: opsmx-terraspin-backend-config
+      - label: TSApplyJob
+        application: opsmx
+        cloudProvider: kubernetes
+        credentials: default
+        description: Stage for terraspin apply operation
+        account: default
+        propertyFile: terraspinapply
+        type: customTSApplyJobStage
+        waitForCompletion: true
+        parameters:
+          - defaultValue: "" 
+            description: Please enter the artifact account name from artifactsaccounts.json.
+            label: Artifact account
+            mapping: 'manifest.spec.template.spec.containers[0].env[0].value'
+            name: Artifact account
+          - defaultValue: "" 
+            description: Please enter overrideVariableFile path if you want to override variables.
+            label: Override file
+            mapping: 'manifest.spec.template.spec.containers[0].env[1].value'
+            name: Override file
+          - defaultValue: "" 
+            description: Please enter the repo name where you want to save terraform intermediate state.
+            label: State repo
+            mapping: 'manifest.spec.template.spec.containers[0].env[2].value'
+            name: State repo
+          - defaultValue: "" 
+            description: Please enter a unique id to identify the terraform state.
+            label: UUId
+            mapping: 'manifest.spec.template.spec.containers[0].env[3].value'
+            name: UUId
+          - defaultValue: "" 
+            description: Please enter AWS IAM role name.
+            label: "iam.amazonaws.com/role"
+            mapping: "manifest.spec.template.metadata.annotations.'iam.amazonaws.com/role'"
+            name: "k8annotation"
+        manifest:
+          apiVersion: batch/v1
+          kind: Job
+          metadata:
+            name: terraspinapplyjob
+            namespace: robin
+          spec:
+            backoffLimit: 0
+            template:
+              metadata:
+                annotations:
+                  "[iam.amazonaws.com/role]":
+              spec:
+                containers:
+                  - command:
+                      - ApplyRun.sh
+                    env:
+                      - name: artifactAccount
+                        value: 
+                      - name: variableOverrideFileRepo
+                        value: 
+                      - name: stateRepo
+                        value: 
+                      - name: uuId
+                        value: 
+                      - name: component
+                        value: apply
+                    image: 'docker.io/opsmx11/terraspinjob:4.0'
+                    imagePullPolicy: Always
+                    name: terraspinapply
+                    volumeMounts:
+                      - mountPath: /home/terraspin/opsmx/app/config/
+                        name: opsmx-terraspin-backend-config
+                restartPolicy: Never
+                volumes:
+                  - configMap:
+                      name: terraspinbackendconfig
+                    name: opsmx-terraspin-backend-config
+      - label: TSDestroyJob
+        application: opsmx
+        cloudProvider: kubernetes
+        credentials: default
+        description: Stage for terraspin destroy operation
+        account: default
+        type: customTSDestroyJobStage
+        waitForCompletion: true
+        parameters:
+          - defaultValue: "" 
+            description: Please enter the artifact account name from artifactsaccounts.json.
+            label: Artifact account
+            mapping: 'manifest.spec.template.spec.containers[0].env[0].value'
+            name: Artifact account
+          - defaultValue: "" 
+            description: Please enter the repo name where you want to save terraform intermediate state.
+            label: State repo
+            mapping: 'manifest.spec.template.spec.containers[0].env[1].value'
+            name: State repo
+          - defaultValue: "" 
+            description: Please enter a unique id to identify the terraform state.
+            label: UUID
+            mapping: 'manifest.spec.template.spec.containers[0].env[2].value'
+            name: UUID
+          - defaultValue: "" 
+            description: Please enter AWS IAM role name.
+            label: "iam.amazonaws.com/role"
+            mapping: "manifest.spec.template.metadata.annotations.'iam.amazonaws.com/role'"
+            name: "k8annotation"
+        manifest:
+          apiVersion: batch/v1
+          kind: Job
+          metadata:
+            name: terraspindestroyjob
+            namespace: robin
+          spec:
+            backoffLimit: 0
+            template:
+              metadata:
+                annotations:
+                  "[iam.amazonaws.com/role]":
+              spec:
+                containers:
+                  - command:
+                      - DestroyRun.sh
+                    env:
+                      - name: artifactAccount
+                        value: 
+                      - name: stateRepo
+                        value: 
+                      - name: uuId
+                        value: 
+                      - name: component
+                        value: destroy
+                    image: 'docker.io/opsmx11/terraspinjob:4.0'
+                    imagePullPolicy: Always
+                    name: terraspindestroy
+                    volumeMounts:
+                      - mountPath: /home/terraspin/opsmx/app/config/
+                        name: opsmx-terraspin-backend-config
+                restartPolicy: Never
+                volumes:
+                  - configMap:
+                      name: terraspinbackendconfig
+                    name: opsmx-terraspin-backend-config

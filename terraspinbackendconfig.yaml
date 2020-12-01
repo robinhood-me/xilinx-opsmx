@@ -1,0 +1,18 @@
+apiVersion: v1
+data:
+  artifactaccounts.json: |
+    {
+              "artifactaccounts": [
+                {
+                  "accountname": "OpsMx-artifact-Github-account",
+                  "artifacttype": "Github",
+                  "host": "https://github.com",
+                  "username": "opsmxdemo",
+                  "password": "0ps3xde30"
+                },
+              ]
+    }
+kind: ConfigMap
+metadata:
+  name: terraspinbackendconfig
+  namespace: spinterra

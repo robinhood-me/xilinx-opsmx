@@ -1,0 +1,211 @@
+# https://github.com/kubernetes/kubernetes/blob/master/cluster/addons/fluentd-elasticsearch/fluentd-es-ds.yaml
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: fluentd
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: fluentd-es
+  namespace: fluentd
+  labels:
+    app.kubernetes.io/instance: fluentd-es 
+    app.kubernetes.io/name: fluentd-es
+    kubernetes.io/cluster-service: "true"
+    addonmanager.kubernetes.io/mode: Reconcile
+---
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1beta1
+metadata:
+  name: fluentd-es
+  labels:
+    app.kubernetes.io/instance: fluentd-es
+    app.kubernetes.io/name: fluentd-es
+    kubernetes.io/cluster-service: "true"
+    addonmanager.kubernetes.io/mode: Reconcile
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - "namespaces"
+  - "pods"
+  verbs:
+  - "get"
+  - "watch"
+  - "list"
+---
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1beta1
+metadata:
+  name: fluentd-es
+  labels:
+    app.kubernetes.io/instance: fluentd-es
+    app.kubernetes.io/name: fluentd-es
+    kubernetes.io/cluster-service: "true"
+    addonmanager.kubernetes.io/mode: Reconcile
+subjects:
+- kind: ServiceAccount
+  name: fluentd-es
+  namespace: fluentd
+  apiGroup: ""
+roleRef:
+  kind: ClusterRole
+  name: fluentd-es
+  apiGroup: ""
+
+---
+apiVersion: v1
+data:
+  containers.input.conf: |-
+    <source>
+      @id fluentd-containers.log
+      @type tail
+      path /var/log/containers/*.log
+      pos_file /var/log/fluentd-containers.log.pos
+      time_format %Y-%m-%dT%H:%M:%S.%NZ
+      tag raw.kubernetes.*
+      format json
+      read_from_head true
+    </source>
+    <match raw.kubernetes.**>
+      @id raw.kubernetes
+      @type detect_exceptions
+      remove_tag_prefix raw
+      message log
+      stream stream
+      multiline_flush_interval 5
+      max_bytes 500000
+      max_lines 1000
+    </match>
+  forward.input.conf: |-
+    <source>
+      @type forward
+    </source>
+  output.conf: |-
+    <filter kubernetes.**>
+      @type kubernetes_metadata
+    </filter>
+
+    <filter kubernetes.var.log.containers.issuegen**.log>
+       @type concat
+       key log
+       multiline_start_regexp /\d{2}:\d{2}:\d{2}.\d{3}\s*/
+       stream_identity_key kubernetes.pod_name
+       flush_interval 3
+       timeout_label @NORMAL
+    </filter>
+    <match kubernetes.var.log.containers.issuegen**.log>
+      @type relabel
+      @label @NORMAL
+    </match>
+
+    <label @NORMAL>
+      <filter kubernetes.var.log.containers.issuegen**.log>
+        @type parser
+        key_name log
+        remove_key_name_field true
+        reserve_data true
+        <parse>
+          @type multiline
+          format_firstline /\d{2}:\d{2}:\d{2}.\d{3}\s*/
+          format1 /(?<timestamp>(?:2[0123]|[01]?[0-9]):(?:[0-5][0-9]):(?:(?:[0-5]?[0-9]|60)(?:[:.,][0-9]+)?))\s*\[(?<thread>(.*?)*)\]\s*(?<level>(\b\w+\b))\s*(?<logger>(.*?))\s*-\s*(?<log>(.*))/
+          time_key timestamp
+        </parse>
+      </filter>
+      <match kubernetes.var.log.containers.issuegen**.log>
+        @id elasticsearch
+          @type elasticsearch
+          host oeselastic7.opsmx.com
+          port 443
+          ssl_version TLSv1_2
+          scheme https
+          ssl_verify false
+          user opsmxuser
+          password OpsMx@123
+          logstash_dateformat %Y%m%d
+          key_time_format %Y-%m-%dT%H:%M:%S.%N%:z
+          logstash_format true
+          logstash_prefix "opsmx"
+          reconnect_on_error true
+      </match>
+    </label>
+  system.conf: |-
+    <system>
+      root_dir /tmp/logstash-buffers/
+    </system>
+kind: ConfigMap
+metadata:
+  labels:
+    addonmanager.kubernetes.io/mode: Reconcile
+    app.kubernetes.io/instance: fluentd-es
+    app.kubernetes.io/managed-by: Tiller
+    app.kubernetes.io/name: fluentd-es
+    kubernetes.io/cluster-service: "true"
+  name: efk-fluentd-elasticsearch
+  namespace: fluentd
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  labels:
+    k8s-app: fluentd-es
+  name: fluentd-es
+  namespace: fluentd
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: fluentd-es
+      app.kubernetes.io/name: fluentd-es
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/instance: fluentd-es
+        app.kubernetes.io/name: fluentd-es
+    spec:
+      serviceAccountName: fluentd-es
+      containers:
+        -
+          image: "gcr.io/google_containers/fluentd-elasticsearch:v2.3.2"
+          imagePullPolicy: IfNotPresent
+          name: fluentd-es
+          livenessProbe:
+            exec:
+              command:
+              - /bin/sh
+              - -c
+              - |
+                LIVENESS_THRESHOLD_SECONDS=${LIVENESS_THRESHOLD_SECONDS:-300}; STUCK_THRESHOLD_SECONDS=${LIVENESS_THRESHOLD_SECONDS:-900}; if [ ! -e /var/log/fluentd-buffers ]; then
+                  exit 1;
+                fi; touch -d "${STUCK_THRESHOLD_SECONDS} seconds ago" /tmp/marker-stuck; if [[ -z "$(find /var/log/fluentd-buffers -type f -newer /tmp/marker-stuck -print -quit)" ]]; then
+                  rm -rf /var/log/fluentd-buffers;
+                  exit 1;
+                fi; touch -d "${LIVENESS_THRESHOLD_SECONDS} seconds ago" /tmp/marker-liveness; if [[ -z "$(find /var/log/fluentd-buffers -type f -newer /tmp/marker-liveness -print -quit)" ]]; then
+                  exit 1;
+                fi;
+            failureThreshold: 3
+            initialDelaySeconds: 600
+            periodSeconds: 60
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources: {}
+          volumeMounts:
+            - mountPath: /var/log
+              name: varlog
+            - mountPath: /var/lib/docker/containers
+              name: varlibdockercontainers
+              readOnly: true
+            - mountPath: /etc/fluent/config.d
+              name: config-volume
+      volumes:
+        - hostPath:
+            path: /var/log
+          name: varlog
+        - hostPath:
+            path: /var/lib/docker/containers
+          name: varlibdockercontainers
+        - configMap:
+            defaultMode: 420
+            name: efk-fluentd-elasticsearch
+          name: config-volume

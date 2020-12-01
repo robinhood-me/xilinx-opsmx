@@ -1,0 +1,12 @@
+ repository:
+    artifactory:
+      enabled: true
+      searches:
+      - name: robin
+        permissions: {}
+        baseUrl: https://opsmx1.jfrog.io/artifactory
+        repo: xilinx-spinnaker-art
+        groupId: org.jfrog
+        repoType: maven
+        username: robin
+        password: Goyanks#2416

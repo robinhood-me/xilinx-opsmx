@@ -1,0 +1,47 @@
+{
+  "expectedArtifacts": [
+    {
+      "defaultArtifact": {
+        "artifactAccount": "my-maven-acct",
+        "id": "05eb16fd-9980-4a07-8c47-a0666f5d7245",
+        "reference": "org.jfrog.test:multi:3.7-SNAPSHOT",
+        "type": "maven/file"
+      },
+      "displayName": "grumpy-dingo-69",
+      "id": "f48b0007-af22-404a-83b8-3fb834ca870d",
+      "matchArtifact": {
+        "artifactAccount": "my-maven-acct",
+        "customKind": true,
+        "id": "7b8d0d12-ccf2-49a5-8db0-cabc78165dfb",
+        "reference": "org.jfrog.test:multi:3.7-SNAPSHOT",
+        "type": "maven/file"
+      },
+      "useDefaultArtifact": true,
+      "usePriorArtifact": false
+    }
+  ],
+  "keepWaitingPipelines": false,
+  "lastModifiedBy": "admin",
+  "limitConcurrent": true,
+  "spelEvaluator": "v4",
+  "stages": [
+    {
+      "name": "Wait",
+      "refId": "1",
+      "requisiteStageRefIds": [],
+      "type": "wait",
+      "waitTime": 5
+    }
+  ],
+  "triggers": [
+    {
+      "artifactorySearchName": "robin",
+      "enabled": true,
+      "expectedArtifactIds": [
+        "f48b0007-af22-404a-83b8-3fb834ca870d"
+      ],
+      "type": "artifactory"
+    }
+  ],
+  "updateTs": "1606286807000"
+}
