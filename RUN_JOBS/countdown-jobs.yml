@@ -3,7 +3,7 @@ kind: Job
 metadata:
   name: countdown
   label:
-    app: countdown
+    app: countdown1
 spec:
   template:
     metadata:
