@@ -2,8 +2,6 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: countdown
-  labels:
-    app: countdown1
 spec:
   template:
     metadata:
