@@ -1,0 +1,79 @@
+{
+    "keepWaitingPipelines": false,
+    "lastModifiedBy": "admin",
+    "limitConcurrent": true,
+    "spelEvaluator": "v4",
+    "stages": [
+      {
+        "alias": "preconfiguredJob",
+        "name": "TerraformPlan",
+        "parameters": {
+          "Override file": "",
+          "State repo": "OpsMx/staging-terraform-states.git",
+          "Terraform plan": "OpsMx/staging-terraform-pm.git//aws/vpc",
+          "Tf script account": "OpsMx-artifact-Github-account",
+          "Tf state account": "OpsMx-artifact-Github-account",
+          "UUId": "OpsMxadmin-robinhood"
+        },
+        "refId": "1",
+        "requisiteStageRefIds": [],
+        "type": "customTSPlanJobStage"
+      },
+      {
+        "failPipeline": true,
+        "instructions": "Do you want to proceed to Apply the Plan?",
+        "judgmentInputs": [],
+        "name": "Manual Judgment",
+        "notifications": [],
+        "refId": "2",
+        "requisiteStageRefIds": [
+          "1"
+        ],
+        "type": "manualJudgment"
+      },
+      {
+        "alias": "preconfiguredJob",
+        "name": "TerraformApply",
+        "parameters": {
+          "Override file": "",
+          "State repo": "OpsMx/staging-terraform-states.git",
+          "Tf script account": "OpsMx-artifact-Github-account",
+          "Tf state account": "OpsMx-artifact-Github-account",
+          "UUId": "OpsMxadmin-robinhood"
+        },
+        "refId": "3",
+        "requisiteStageRefIds": [
+          "2"
+        ],
+        "type": "customTSApplyJobStage"
+      },
+      {
+        "failPipeline": true,
+        "instructions": "Are you sick of this deployment, if so, destroy it!",
+        "judgmentInputs": [],
+        "name": "Manual Judgment",
+        "notifications": [],
+        "refId": "4",
+        "requisiteStageRefIds": [
+          "3"
+        ],
+        "type": "manualJudgment"
+      },
+      {
+        "alias": "preconfiguredJob",
+        "name": "TerraformDestroy",
+        "parameters": {
+          "State repo": "OpsMx/staging-terraform-states.git",
+          "Tf state account": "OpsMx-artifact-Github-account",
+          "UUID": "OpsMxadmin-robinhood"
+        },
+        "refId": "5",
+        "requisiteStageRefIds": [
+          "4"
+        ],
+        "type": "customTSDestroyJobStage"
+      }
+    ],
+    "triggers": [],
+    "updateTs": "1606896260000"
+  }

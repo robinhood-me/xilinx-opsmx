@@ -307,13 +307,13 @@ url : http://jenkins.opsmx.net:8181/jenkins/
    password:  Bumblebee@321$
 
 hal config ci jenkins enable
-echo $APIKEY | hal config ci jenkins master add my-jenkins-master \ --address $BASEURL \ --username $USERNAME \ --password # api key will be read from STDIN to avoid appearing 
-# in your .bash_history 
+echo $APIKEY | hal config ci jenkins master add my-jenkins-master \--address $BASEURL \--username $USERNAME \--password # api key will be read from STDIN to avoid appearing
+# in your .bash_history
 hal config ci jenkins enable
 
 117a7ea3dcf1be7844d304c1aab7d4935e
 
-echo $APIKEY | hal config ci jenkins master add my-jenkins-master \ --address http://jenkins.opsmx.net:8181/jenkins/ \ --username opsmxspin \ --password 
+echo $APIKEY | hal config ci jenkins master add my-jenkins-master \--address http://jenkins.opsmx.net:8181/jenkins/ \--username opsmxspin \--password 
 
  hal config ci jenkins master get my-jenkins-master
 + Get current deployment
@@ -411,7 +411,7 @@ service and replicaset is connected by selector app=kubecanary
 
 AUTOPILOT  
 Our Autopilot app
-https://oes-demo.opsmx.com/policymanagement Admin/opsmx@123
+https://oes-demo.opsmx.com/policymanagementAdmin/opsmx@123
 
 Template
 - service

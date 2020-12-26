@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    artifact.spinnaker.io/location: default
+    artifact.spinnaker.io/name: opsmx-restapp
+    artifact.spinnaker.io/type: kubernetes/deployment
+    moniker.spinnaker.io/application: multiclouddemo
+    moniker.spinnaker.io/cluster: deployment opsmx-restapp
+    strategy.spinnaker.io/max-version-history: '2'
+  labels:
+    app.kubernetes.io/managed-by: spinnaker
+    app.kubernetes.io/name: multiclouddemo
+  name: opsmx-restapp
+  namespace: default
+spec:
+  replicas: 1
+  revisionHistoryLimit: 2
+  selector:
+    matchLabels:
+      app: opsmx-restapp
+  template:
+    metadata:
+      annotations:
+        artifact.spinnaker.io/location: default
+        artifact.spinnaker.io/name: opsmx-restapp
+        artifact.spinnaker.io/type: kubernetes/deployment
+        moniker.spinnaker.io/application: multiclouddemo
+        moniker.spinnaker.io/cluster: deployment opsmx-restapp
+      labels:
+        app: opsmx-restapp
+        app.kubernetes.io/managed-by: spinnaker
+        app.kubernetes.io/name: multiclouddemo
+        version: simple-restapp-21
+    spec:
+      containers:
+        - image: 'docker.io/opsmx11/restapp:simple-restapp-21'
+          imagePullPolicy: Always
+          name: restapp
+          ports:
+            - containerPort: 8080
+              name: http
+              protocol: TCP
+            - containerPort: 9090
+              name: prometheus
+              protocol: TCP
+      imagePullSecrets:
+        - name: oes-repo

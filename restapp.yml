@@ -1,0 +1,43 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: opsmx-restapp
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: opsmx-restapp
+  template:
+    metadata:
+      labels:
+        app: opsmx-restapp
+    spec:
+      containers:
+        - image: docker.io/opsmx11/restapp:${#stage("Build")["context"]["Buildnumber"]}
+          imagePullPolicy: Always
+          name: restapp
+          ports:
+            - containerPort: 8080
+              name: http
+              protocol: TCP
+            - containerPort: 9090
+              name: prometheus
+              protocol: TCP 
+---           
+apiVersion: v1
+kind: Service
+metadata:
+  name: opsmx-rest-service
+spec:
+  type: LoadBalancer
+  ports:
+    - port: 8080
+      targetPort: 8080
+      protocol: TCP
+      name: canary
+    - port: 9090
+      targetPort: 9090
+      protocol: TCP
+      name: reports
+  selector:
+    app: opsmx-restapp

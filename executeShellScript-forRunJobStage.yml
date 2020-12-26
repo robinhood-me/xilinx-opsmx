@@ -1,0 +1,22 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: executescript
+  namespace: default
+spec:
+  backoffLimit: 2
+  template:
+    spec:
+      containers:
+        - args:
+            - >-
+              echo "Fetching OES values.yaml" wget
+              https://raw.githubusercontent.com/OpsMx/enterprise-spinnaker/master/charts/oes/values.yaml
+              echo "Display the contents of values.yaml" cat values.yaml
+          command:
+            - /bin/sh
+            - '-x'
+            - '-c'
+          image: opsmxdev/apline-with-curl
+          name: executescript
+      restartPolicy: Never

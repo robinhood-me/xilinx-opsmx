@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    artifact.spinnaker.io/location: default
+    artifact.spinnaker.io/name: restapp-service
+    artifact.spinnaker.io/type: kubernetesservice
+    artifact.spinnaker.io/application: eks-demo
+    artifact.spinnaker.io/cluster: service restapp-service
+  labels:
+    app.kubernetes.io/managed-by: spinnaker
+    app.kubernetes.io/name: eks-demo
+  name: restapp-service
+  namespace: default
+spec:
+  ports:
+    - name: canary
+      port: 8080
+      protocol: TCP
+      targetPort: 8080
+    - name: reports
+      port: 9090
+      protocol: TCP
+      targetPort: 9090
+  selector:
+    app: opsmx-restapp
+  type: LoadBalancer
